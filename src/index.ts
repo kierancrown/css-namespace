@@ -1,13 +1,15 @@
 import { Media, parse, Rule, stringify } from 'css';
 import { join } from 'path';
 import { readFile, writeFile } from 'fs/promises';
-
+import commandLineArgs from 'command-line-args';
+import { existsSync } from 'fs';
 interface mainArgs {
     cssFilePath: string;
     containerName: string;
+    verbose?: boolean;
 }
 
-async function main({ cssFilePath, containerName }: mainArgs) {
+async function parseCss({ cssFilePath, containerName, verbose = false }: mainArgs) {
     const css = await readFile(cssFilePath, 'utf8');
     const obj = parse(css, {});
     if (!obj.stylesheet || obj.stylesheet?.rules.length === 0) {
@@ -15,7 +17,7 @@ async function main({ cssFilePath, containerName }: mainArgs) {
     }
     // Loop through rule replacing selectors with prefix
     for (let i = 0; i < obj.stylesheet.rules.length; i++) {
-        let rule = obj.stylesheet.rules[i];
+        const rule = obj.stylesheet.rules[i];
 
         if (rule.type === 'rule') {
             const _rule = rule as Rule;
@@ -25,15 +27,15 @@ async function main({ cssFilePath, containerName }: mainArgs) {
                     if (!selector.includes(containerName)) {
                         if (selector === 'html' || selector === 'body') {
                             // If rule is html or body change to container name
-                            console.log(`Changing ${selector} to ${containerName}`);
+                            if (verbose === true) console.log(`Changing ${selector} to ${containerName}`);
                             _rule.selectors[j] = `${containerName}`;
                         } else if (selector.startsWith(':')) {
                             // If rule is pseudo selector change to container name
-                            console.log(`Changing ${selector} to ${containerName}${selector}`);
+                            if (verbose === true) console.log(`Changing ${selector} to ${containerName}${selector}`);
                             _rule.selectors[j] = `${containerName}${selector}`;
                         } else {
                             // If rule is normal selector change to container name
-                            console.log(`Changing ${selector} to ${containerName} ${selector}`);
+                            if (verbose === true) console.log(`Changing ${selector} to ${containerName} ${selector}`);
                             _rule.selectors[j] = `${containerName} ${selector}`;
                         }
                     }
@@ -53,15 +55,17 @@ async function main({ cssFilePath, containerName }: mainArgs) {
                             if (!selector.includes(containerName)) {
                                 if (selector === 'html' || selector === 'body') {
                                     // If rule is html or body change to container name
-                                    console.log(`Changing ${selector} to ${containerName}`);
+                                    if (verbose === true) console.log(`Changing ${selector} to ${containerName}`);
                                     _rule.selectors[k] = `${containerName}`;
                                 } else if (selector.startsWith(':')) {
                                     // If rule is pseudo selector change to container name
-                                    console.log(`Changing ${selector} to ${containerName}${selector}`);
+                                    if (verbose === true)
+                                        console.log(`Changing ${selector} to ${containerName}${selector}`);
                                     _rule.selectors[k] = `${containerName}${selector}`;
                                 } else {
                                     // If rule is normal selector change to container name
-                                    console.log(`Changing ${selector} to ${containerName} ${selector}`);
+                                    if (verbose === true)
+                                        console.log(`Changing ${selector} to ${containerName} ${selector}`);
                                     _rule.selectors[k] = `${containerName} ${selector}`;
                                 }
                             }
@@ -76,9 +80,46 @@ async function main({ cssFilePath, containerName }: mainArgs) {
         }
     }
 
-    // Write new css file
-    await writeFile(join(__dirname, '../example-modified.css'), stringify(obj));
+    return stringify(obj);
 }
 
-const examplePath = join(__dirname, '../example.css');
-main({ cssFilePath: examplePath, containerName: '#app' });
+const optionDefinitions = [
+    { name: 'verbose', alias: 'v', type: Boolean, defaultValue: false },
+    { name: 'input', alias: 'i', type: String },
+    { name: 'selector', alias: 's', type: String },
+    { name: 'output', alias: 'o', type: String },
+];
+
+async function main() {
+    try {
+        const args = commandLineArgs(optionDefinitions);
+        // Checks
+        if (!args.input) {
+            console.error('No input file specified');
+            process.exit(1);
+        }
+        if (!args.selector) {
+            console.error('No selector specified');
+            process.exit(1);
+        }
+        if (!existsSync(args.input)) {
+            console.error(`Input file ${args.input} does not exist`);
+            process.exit(1);
+        }
+
+        const outputPath = args.output || join(process.cwd(), 'output.css');
+
+        // Write new css file
+        await writeFile(
+            outputPath,
+            await parseCss({ cssFilePath: args.input, containerName: args.selector, verbose: args.verbose || false }),
+        );
+
+        process.exit(0);
+    } catch (error) {
+        console.error(error);
+        process.exit(1);
+    }
+}
+
+main();
