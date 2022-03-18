@@ -1,6 +1,6 @@
 {
   "name": "css-container",
-  "description": "",
+  "description": "This utility takes a css file (input) and prefixes (contains) the css rules with a selector",
   "version": "1.0.0",
   "author": "Kieran Crown <kieran.crown@gmail.com>",
   "main": "dist/index.js",
