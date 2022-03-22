@@ -1,6 +1,6 @@
 {
-  "name": "css-container",
-  "description": "This utility takes a css file (input) and prefixes (contains) the css rules with a selector",
+  "name": "css-namespace",
+  "description": "This utility takes a css file (input) and prefixes (encapsulates) the css rules with the desired namespace.",
   "version": "1.0.0",
   "author": "Kieran Crown <kieran.crown@gmail.com>",
   "main": "dist/index.js",
@@ -11,8 +11,7 @@
   },
   "dependencies": {
     "command-line-args": "^5.2.1",
-    "css": "^3.0.0",
-    "ora": "^5.4.1"
+    "css": "^3.0.0"
   },
   "devDependencies": {
     "@types/command-line-args": "^5.2.0",

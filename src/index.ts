@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { Media, parse, Rule, stringify } from 'css';
 import { join } from 'path';
 import { readFile, writeFile } from 'fs/promises';
@@ -7,9 +8,17 @@ interface mainArgs {
     cssFilePath: string;
     containerName: string;
     verbose?: boolean;
+    pretty?: boolean;
 }
 
-async function parseCss({ cssFilePath, containerName, verbose = false }: mainArgs) {
+function minifyCss(css: string) {
+    return css
+        .replace(/\s+/g, ' ')
+        .replace(/\s*\{\s*/g, '{')
+        .replace(/\s*\}\s*/g, '}');
+}
+
+async function parseCss({ cssFilePath, containerName, verbose = false, pretty = false }: mainArgs) {
     const css = await readFile(cssFilePath, 'utf8');
     const obj = parse(css, {});
     if (!obj.stylesheet || obj.stylesheet?.rules.length === 0) {
@@ -80,14 +89,15 @@ async function parseCss({ cssFilePath, containerName, verbose = false }: mainArg
         }
     }
 
-    return stringify(obj);
+    return pretty ? stringify(obj) : minifyCss(stringify(obj));
 }
 
 const optionDefinitions = [
     { name: 'verbose', alias: 'v', type: Boolean, defaultValue: false },
     { name: 'input', alias: 'i', type: String },
-    { name: 'selector', alias: 's', type: String },
+    { name: 'selector', type: String },
     { name: 'output', alias: 'o', type: String },
+    { name: 'pretty', type: Boolean, defaultValue: false },
 ];
 
 async function main() {
@@ -112,7 +122,12 @@ async function main() {
         // Write new css file
         await writeFile(
             outputPath,
-            await parseCss({ cssFilePath: args.input, containerName: args.selector, verbose: args.verbose || false }),
+            await parseCss({
+                cssFilePath: args.input,
+                containerName: args.selector,
+                verbose: args.verbose || false,
+                pretty: args.pretty || false,
+            }),
         );
 
         process.exit(0);
