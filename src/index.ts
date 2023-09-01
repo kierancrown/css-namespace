@@ -95,8 +95,9 @@ async function parseCss({ cssFilePath, containerName, verbose = false, pretty = 
 const optionDefinitions = [
     { name: 'verbose', alias: 'v', type: Boolean, defaultValue: false },
     { name: 'input', alias: 'i', type: String },
-    { name: 'selector', type: String },
+    { name: 'selector', alias: 's', type: String },
     { name: 'output', alias: 'o', type: String },
+    { name: 'overwrite', alias: 'w', type: Boolean, defaultValue: false },
     { name: 'pretty', type: Boolean, defaultValue: false },
 ];
 
@@ -117,7 +118,7 @@ async function main() {
             process.exit(1);
         }
 
-        const outputPath = args.output || join(process.cwd(), 'output.css');
+        const outputPath = args.output || args.overwrite === true ? args.input : join(process.cwd(), 'output.css');
 
         // Write new css file
         await writeFile(

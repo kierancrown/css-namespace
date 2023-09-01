@@ -9,9 +9,11 @@ I was trying to contain the Tailwind CSS library within a container. I couldn't 
 Clone this project and run `yarn` or `npm i`. Then run the program with `node`.
 
 ### Command Line Args
-| Argument      | Description                                      | Required |
-| -----------   | ------------------------------------------------ | -------- |
-| cssFilePath   | File path of the CSS file                        | YES      |
-| containerName | The css selector that will be added to each rule | YES      |
-| verbose       | Print out extra information                      | NO       |
-| pretty        | Formats the CSS (unminified)                     | NO       |
+| Argument   | Alias | Type     | Default Value | Description                                      |
+|------------|-------|----------|---------------|--------------------------------------------------|
+| verbose    | v     | Boolean  | false         | Enable verbose mode for detailed output.         |
+| input      | i     | String   |               | Specify the input file or data source.           |
+| selector   | s     | String   |               | Define a selector for filtering data.            |
+| output     | o     | String   |               | Specify the output file or destination.          |
+| overwrite  | w     | Boolean  | false         | Overwrite the original css file                  |
+| pretty     |       | Boolean  | false         | Enable pretty formatting for the output data.    |
