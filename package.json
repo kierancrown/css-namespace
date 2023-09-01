@@ -1,7 +1,7 @@
 {
     "name": "css-namespace",
     "description": "This utility takes a css file (input) and prefixes (encapsulates) the css rules with the desired namespace.",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "author": "Kieran Crown <kieran.crown@gmail.com>",
     "main": "dist/index.js",
     "bin": {
