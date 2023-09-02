@@ -1,7 +1,7 @@
 {
     "name": "css-namespace",
     "description": "This utility takes a css file (input) and prefixes (namespaces) the css rules with a predefined selector",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "author": "Kieran Crown <kieran.crown@gmail.com>",
     "main": "dist/index.js",
     "bin": {
@@ -16,7 +16,7 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/kierancrown/css-namespace"
-      },
+    },
     "dependencies": {
         "command-line-args": "^5.2.1",
         "css": "^3.0.0"
