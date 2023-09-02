@@ -1,10 +1,10 @@
 # CSS Namespace
 
-This utility takes a css file (input) and prefixes (namespaces) the css rules with a selector.
+This utility takes a css file (input) and prefixes (namespaces) the css rules with a predefined selector.
 
 ## Why
 
-I was trying to contain the Tailwind CSS library styles within a container. I couldn't see a easy way to prepend every css rule with my `#app` selector. So I decided to write this small utility to get the job done.
+I needed to add a selector to every single rule in a large CSS file post build. I couldn't find anything that did what I needed, so I built it!
 
 ## Running
 
@@ -13,7 +13,7 @@ You can run this by either installing this package as a dev dependency or by usi
 ### Install as a dev dependency
 
 ```bash
-npm install --save-dev css-container
+npm install --save-dev css-namespace
 ```
 
 You can then add a script to your package.json file to run the utility.
