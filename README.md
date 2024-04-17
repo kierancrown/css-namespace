@@ -37,8 +37,8 @@ npx css-container -i ./src/styles.css -s #app -w
 | Argument  | Alias | Type    | Default Value  | Description                                         |
 | --------- | ----- | ------- | -------------- | --------------------------------------------------- |
 | verbose   | v     | Boolean | false          | Enable verbose mode for detailed output.            |
-| input     | i     | String  |                | Specify the input file or data source.              |
+| input     | i     | String  |                | Specify the input file/folder or data source.       |
 | selector  | s     | String  |                | Define a selector for filtering data.               |
-| output    | o     | String  | './output.css' | Specify the output file or destination.             |
+| output    | o     | String  | './output.css' | Specify the output file/folder or destination.      |
 | overwrite | w     | Boolean | false          | Overwrite the original css file (output is ignored) |
 | pretty    |       | Boolean | false          | Enable pretty formatting for the output data.       |
