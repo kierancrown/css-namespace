@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import { Media, parse, Rule, stringify } from 'css';
-import { join } from 'path';
+import { join, extname } from 'path';
 import { readFile, writeFile } from 'fs/promises';
 import commandLineArgs from 'command-line-args';
-import { existsSync } from 'fs';
+import { existsSync, lstatSync, readdirSync } from 'fs';
 interface mainArgs {
     cssFilePath: string;
     containerName: string;
@@ -103,33 +103,61 @@ const optionDefinitions = [
 
 async function main() {
     try {
-        const args = commandLineArgs(optionDefinitions);
+        const {
+            input,
+            selector,
+            output,
+            overwrite,
+            verbose,
+            pretty,
+        } = commandLineArgs(optionDefinitions);
         // Checks
-        if (!args.input) {
+        if (!input) {
             console.error('No input file specified');
             process.exit(1);
         }
-        if (!args.selector) {
+        if (!selector) {
             console.error('No selector specified');
             process.exit(1);
         }
-        if (!existsSync(args.input)) {
-            console.error(`Input file ${args.input} does not exist`);
+        if (!existsSync(input)) {
+            console.error(`Input file/folder ${input} does not exist`);
+            process.exit(1);
+        }
+        const isInputFile = lstatSync(input).isFile();
+        if (isInputFile && output && existsSync(output) && !lstatSync(output).isFile()) {
+            console.error(`Output ${output} is a directory`);
+            process.exit(1);
+        }
+        if (!isInputFile && output && existsSync(output) && lstatSync(output).isFile()) {
+            console.error(`Output ${output} is a file`);
             process.exit(1);
         }
 
-        const outputPath = args.output || args.overwrite === true ? args.input : join(process.cwd(), 'output.css');
+        const isOverride = output || overwrite === true;
 
-        // Write new css file
-        await writeFile(
-            outputPath,
-            await parseCss({
-                cssFilePath: args.input,
-                containerName: args.selector,
-                verbose: args.verbose || false,
-                pretty: args.pretty || false,
-            }),
-        );
+        const inputSources = isInputFile
+            ? [ input ]
+            : readdirSync(input)
+                .filter(fileName => extname(fileName).toLowerCase() === '.css')
+                .map(fileName => join(input, fileName))
+
+        for (const i in inputSources) {
+            const inputPath = inputSources[i];
+            const outputPath = isOverride
+                ? output || inputPath
+                : join(process.cwd(), isInputFile ? 'output.css' : `output${i}.css`);
+            // Write new css file
+            await writeFile(
+                outputPath,
+                await parseCss({
+                    cssFilePath: inputPath,
+                    containerName: selector,
+                    verbose: verbose || false,
+                    pretty: pretty || false,
+                }),
+            );
+        }
 
         process.exit(0);
     } catch (error) {
